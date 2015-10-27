@@ -9,7 +9,7 @@ require 'myweatherforecast'
 class MyWeatherFeed < DailyNotices
 
   def initialize(filepath='', location: nil, api_key: nil, \
-                                     url_base: '', dx_xslt: '', rss_xslt: '', refreshrate: 1)
+                    url_base: '', dx_xslt: '', rss_xslt: '', refreshrate: nil)
 
     super(filepath, url_base: url_base, dx_xslt: dx_xslt, rss_xslt: rss_xslt)
 
@@ -43,7 +43,7 @@ class MyWeatherFeed < DailyNotices
     
     if @refreshrate then
       
-      @h = {nextrefresh: Time.now + @refreshrate * 60, notice: notice}
+      @h = {nextrefresh: (Time.now + @refreshrate * 60).to_s, notice: notice}
       File.write @datafile, Kvx.new(@h)
       
     end
