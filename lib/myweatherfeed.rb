@@ -9,7 +9,7 @@ require 'myweatherforecast'
 class MyWeatherFeed < DailyNotices
 
   def initialize(filepath='', location: nil, api_key: nil, \
-                                     url_base: '', dx_xslt: '', rss_xslt: '')
+                                     url_base: '', dx_xslt: '', rss_xslt: '', refreshrate: 1)
 
     super(filepath, url_base: url_base, dx_xslt: dx_xslt, rss_xslt: rss_xslt)
 
@@ -17,12 +17,36 @@ class MyWeatherFeed < DailyNotices
     self.title = 'My weather feed for ' + \
                         (location || @w.coordinates.join(', '))
     self.description = 'Weather data fetched from forecast.io'
+    
+    # set the time last updated in the hidden scratch file if refreshrate set
+    
+    @datafile = File.join(@filepath, '.myweatherfeed')
+    @refreshrate = refreshrate
+    
+    if refreshrate then           
+      
+      @h =  File.exists?(@datafile) ? Kvx.new(File.read(@datafile)).to_h : {}
 
+    end
+    
   end
 
   def update()
+        
+    return if @freshrate and @nextrefresh > Time.now
     
-    self.add @w.now.to_s
+    notice = @w.now.to_s
+    
+    return if notice == @h[:notice]
+    
+    self.add notice
+    
+    if @refreshrate then
+      
+      @h = {nextrefesh: Time.now + @refreshrate * 60, notice: notice}
+      File.write @datafile, Kvx.new(@h)
+      
+    end
 
   end
 
