@@ -25,7 +25,7 @@ class MyWeatherFeed < DailyNotices
     
     if refreshrate then           
       
-      @h =  File.exists?(@datafile) ? Kvx.new(File.read(@datafile)).to_h : {}
+      @h =  File.exists?(@datafile) ? Kvx.new(File.read(@datafile)).to_h : {nextrefresh: Time.now.to_s, notice: ''}
 
     end
     
@@ -33,17 +33,17 @@ class MyWeatherFeed < DailyNotices
 
   def update()
         
-    return if @freshrate and @nextrefresh > Time.now
-    
+    return if @refreshrate and Time.parse(@h[:nextrefresh]) > Time.now
+
     notice = @w.now.to_s
-    
+
     return if notice == @h[:notice]
     
     self.add notice
     
     if @refreshrate then
       
-      @h = {nextrefesh: Time.now + @refreshrate * 60, notice: notice}
+      @h = {nextrefresh: Time.now + @refreshrate * 60, notice: notice}
       File.write @datafile, Kvx.new(@h)
       
     end
