@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'myweatherfeed'
-  s.version = '0.1.3'
+  s.version = '0.1.4'
   s.summary = 'Generates an RSS feed for the weather data using the myweatherforecast gem'
   s.authors = ['James Robertson']
   s.files = Dir['lib/myweatherfeed.rb']

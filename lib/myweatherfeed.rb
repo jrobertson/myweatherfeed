@@ -13,7 +13,10 @@ class MyWeatherFeed < DailyNotices
 
     super(filepath, url_base: url_base, dx_xslt: dx_xslt, rss_xslt: rss_xslt)
 
-    @w = MyWeatherForecast.new location, api_key: api_key
+    @api_key = api_key
+    w = MyWeatherForecast.new location, api_key: api_key
+    @coordinates = w.coordinates
+    
     self.title = 'My weather feed for ' + \
                         (location || @w.coordinates.join(', '))
     self.description = 'Weather data fetched from forecast.io'
@@ -33,9 +36,10 @@ class MyWeatherFeed < DailyNotices
 
   def update()
         
-    return if @refreshrate and Time.parse(@h[:nextrefresh]) > Time.now
+    return if @refreshrate and (Time.parse(@h[:nextrefresh]) > Time.now)
 
-    notice = @w.now.to_s
+    w = MyWeatherForecast.new @coordinates, api_key: @api_key
+    notice = w.now.to_s
 
     return if notice == @h[:notice]
     
