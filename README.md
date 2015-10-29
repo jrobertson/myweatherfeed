@@ -1,3 +1,32 @@
+# What's new in the myweatherfeed gem version 0.1.6
+
+    require 'myweatherfeed'
+
+
+    api_key = '64xxxxxxxxxxx2346354'
+
+    feed = MyWeatherFeed.new '/home/james/jamesrobertson.eu/weather', \
+                     location: 'Lochend, Edinburgh', api_key: api_key, \
+                              url_base: 'http://www.jamesrobertson.eu/',\
+                                          dx_xslt: '/xsl/dynarex-b.xsl', \
+                                  rss_xslt: '/xsl/feed.xsl', refreshrate: 10
+
+    def feed.on_change(now)
+      puts ' -- ' + now.summary
+    end
+
+    feed.start
+
+Console output:
+
+<pre>
+-- Clear
+</pre>
+
+The myweatherfeed gem now features a start method to run the update within a look which by default runs ever minute. In this example it runs every 10 minutes. Also there is an on_change method which can be overridfen by the consumer to create a notification, callback, or webhook.
+
+-----------------------
+
 # What's new in the myweatherfeed gem version 0.1.1
 
 The myweatherfeed gem now features a refresh rate which is set from the intialize method as a named argument called *refreshrate* and is expressed in minutes e.g.
