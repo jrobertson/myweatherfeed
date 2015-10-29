@@ -24,7 +24,7 @@ class MyWeatherFeed < DailyNotices
     # set the time last updated in the hidden scratch file if refreshrate set
     
     @datafile = File.join(@filepath, '.myweatherfeed')
-    @refreshrate = refreshrate
+    @refreshrate = refreshrate.to_i
     
     if refreshrate then           
       
@@ -32,6 +32,10 @@ class MyWeatherFeed < DailyNotices
 
     end
     
+  end
+  
+  def start()
+    loop { self.update; sleep(@refreshrate * 60) }
   end
 
   def update()
@@ -44,6 +48,7 @@ class MyWeatherFeed < DailyNotices
     return if notice == @h[:notice]
     
     self.add notice, uid: Time.now.strftime('%H%M')
+    on_change(w.now)
     
     if @refreshrate then
       
@@ -52,6 +57,14 @@ class MyWeatherFeed < DailyNotices
       
     end
 
+  end
+
+  # override this method for your own custom notifier, callback, or webhook etc.
+  #
+  def on_change(now)
+
+    yield(now)
+    
   end
 
 end
