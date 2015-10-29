@@ -43,7 +43,7 @@ class MyWeatherFeed < DailyNotices
 
     return if notice == @h[:notice]
     
-    self.add notice
+    self.add notice, uid: Time.now.strftime('%H%M')
     
     if @refreshrate then
       
