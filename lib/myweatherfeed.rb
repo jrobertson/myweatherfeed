@@ -47,7 +47,7 @@ class MyWeatherFeed < DailyNotices
 
     return if notice == @h[:notice]
     
-    self.add notice, uid: Time.now.strftime('%H%M')
+    self.add notice, id: Time.now.strftime('%H%M')
     on_change(w.now)
     
     if @refreshrate then
