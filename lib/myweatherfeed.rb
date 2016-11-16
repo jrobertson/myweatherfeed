@@ -2,69 +2,36 @@
 
 # file: myweatherfeed.rb
 
-require 'daily_notices'
+require 'sps-pub'
 require 'myweatherforecast'
 
 
-class MyWeatherFeed < DailyNotices
+class MyWeatherFeed
+  
 
-  def initialize(filepath='', location: nil, api_key: nil, \
-                    url_base: '', dx_xslt: '', rss_xslt: '', refreshrate: nil)
+  def initialize(location: nil, api_key: nil, sps_host: 'sps', \
+                 sps_port: 59000, feed_url: '')
 
-    super(filepath, url_base: url_base, dx_xslt: dx_xslt, rss_xslt: rss_xslt)
-
-    @api_key = api_key
-    w = MyWeatherForecast.new location, api_key: api_key
-    @coordinates = w.coordinates
-    
-    self.title = 'My weather feed for ' + \
-                        (location || @w.coordinates.join(', '))
-    self.description = 'Weather data fetched from forecast.io'
-    
-    # set the time last updated in the hidden scratch file if refreshrate set
-    
-    @datafile = File.join(@filepath, '.myweatherfeed')
-    @refreshrate = refreshrate.to_i
-    
-    if refreshrate then           
-      
-      @h =  File.exists?(@datafile) ? Kvx.new(File.read(@datafile)).to_h : {nextrefresh: Time.now.to_s, notice: ''}
-
-    end
+    @w = MyWeatherForecast.new location, api_key: api_key
+            
+    @sps = SPSPub.new(address: sps_host, port: sps_port)
+            
+    title = 'My weather feed for ' + \
+                        (location.is_a?(Array) ? location.join(', ') :location)
+    description = 'Weather data fetched from forecast.io'    
+            
     
   end
   
-  def start()
-    loop { self.update; sleep(@refreshrate * 60) }
-  end
-
-  def update()
+  def initialize_feed()
         
-    return if @refreshrate and (Time.parse(@h[:nextrefresh]) > Time.now)
-
-    w = MyWeatherForecast.new @coordinates, api_key: @api_key
-    notice = w.now.to_s
-
-    return if notice == @h[:notice]
+    @sps.notice 'notice/weather/title: ' + @title
+    @sps.notice 'notice/weather/profile: ' + @description    
     
-    self.add notice, id: Time.now.strftime('%H%M')
-    on_change(w.now)
-    
-    if @refreshrate then
-      
-      @h = {nextrefresh: (Time.now + @refreshrate * 60).to_s, notice: notice}
-      File.write @datafile, Kvx.new(@h)
-      
-    end
-
   end
-
-  # override this method for your own custom notifier, callback, or webhook etc.
-  #
-  def on_change(now)
-
-    yield(now)
-    
+  
+  def update()
+    @sps.notice 'notice/weather: ' + @w.now.to_s
   end
 
 end
