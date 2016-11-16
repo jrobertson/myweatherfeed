@@ -16,9 +16,9 @@ class MyWeatherFeed
             
     @sps = SPSPub.new(address: sps_host, port: sps_port)
             
-    title = 'My weather feed for ' + \
+    @title = 'My weather feed for ' + \
                         (location.is_a?(Array) ? location.join(', ') :location)
-    description = 'Weather data fetched from forecast.io'    
+    @description = 'Weather data fetched from forecast.io'    
             
     
   end
@@ -26,6 +26,7 @@ class MyWeatherFeed
   def initialize_feed()
         
     @sps.notice 'notice/weather/title: ' + @title
+    sleep 0.3
     @sps.notice 'notice/weather/profile: ' + @description    
     
   end
